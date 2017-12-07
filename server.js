@@ -91,6 +91,10 @@ app.get("/articles", function(req, res) {
   })
 });
 
+app.get("/", function(req,res){
+  res.render("index.html");
+})
+
 // Route for grabbing a specific Article by id, populate it with it's note
 app.get("/articles/:id", function(req, res) {
   // TODO
