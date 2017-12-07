@@ -23,7 +23,7 @@ $.getJSON("/articles", function(data) {
 });
 
 
-// Whenever someone clicks a p tag
+// Whenever someone clicks scrape button
 $(document).on("click", ".btn", function() {
   console.log("click");
 
@@ -40,6 +40,7 @@ $(document).on("click", ".btn", function() {
     // With that done, add the note information to the page
     .done(function(data) {
       console.log(data);
+      location.reload();
     });
 });
 
