@@ -1,0 +1,19 @@
+{{#each articles}}
+  <h4><a target='_blank' href="{{this.link}}"><b>Title:</b>{{this.title}}</h4></a>
+    <p><b>Author:</b>{{this.author}}</p>
+    <p><b>Date:</b>{{this.dateTime}}</p>
+    <p><b>Summary:</b>{{this.summary}}</p>
+    <p><b>Article Id:</b>{{this.externalArticleId}}</p>
+    <btn class="btn btn-success save-btn" data-article-id={{this.externalArticleId}}>Save Article</btn>
+{{/each}}
+
+
+<!-- Save Confirmation Modal -->
+<div class="modal fade" id="modal-save-confirm" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content text-center">
+            <h3>Article Saved</h3>
+            <i class="fa fa-check fa-4x text-success"></i>
+        </div>
+    </div>
+</div>

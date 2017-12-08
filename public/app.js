@@ -1,30 +1,7 @@
-// Grab the articles as a json
-$.getJSON("/articles", function(data) {
-  // For each one
-    for (var i = 0; i < data.length; i++) {
-      // The title of the article
-      $(".article-container").append("<h4><a target='_blank' href="+data[i].link+">" + "<b>Title:</b> " + data[i].title + "</h4>");
-      // An input to enter a new title
-      $(".article-container").append("<p>" + "<b>Author</b>: " + data[i].author + "</p>");
-      // A textarea to add a new note body
-      $(".article-container").append("<p>" + "<b>Date:</b> " + data[i].dateTime + "</p>");
-      // A button to submit a new note, with the id of the article saved to it
-      $(".article-container").append("<p>" + "<b>Summary:</b> " +  data[i].summary + "</p>");
-      $(".article-container").append("<p>" + "<b>Article Id:</b> " + data[i].externalArticleId + "</p><br>");
-
-      // If there's a note in the article
-      if (data[i].note) {
-        // Place the title of the note in the title input
-        $("#titleinput").val(data.note.title);
-        // Place the body of the note in the body textarea
-        $("#bodyinput").val(data.note.body);
-      }
-  }
-});
 
 
 // Whenever someone clicks scrape button
-$(document).on("click", ".btn", function() {
+$(document).on("click", ".scrape-new", function() {
   console.log("click");
 
   // Empty the notes from the note section
@@ -44,20 +21,17 @@ $(document).on("click", ".btn", function() {
     });
 });
 
-// When you click the savenote button
-$(document).on("click", "#savenote", function() {
+// When you click the save button
+$(document).on("click", ".save-btn", function() {
   // Grab the id associated with the article from the submit button
-  var thisId = $(this).attr("data-id");
+  var thisId = $(this).attr("data-article-id");
 
   // Run a POST request to change the note, using what's entered in the inputs
   $.ajax({
-    method: "POST",
+    method: "PUT",
     url: "/articles/" + thisId,
     data: {
-      // Value taken from title input
-      title: $("#titleinput").val(),
-      // Value taken from note textarea
-      body: $("#bodyinput").val()
+      externalArticleId : thisId
     }
   })
     // With that done
@@ -65,10 +39,65 @@ $(document).on("click", "#savenote", function() {
       // Log the response
       console.log(data);
       // Empty the notes section
-      $("#notes").empty();
+      $('#modal-save-confirm').modal('show');
     });
+    $("#modal-save-confirm").on('hidden.bs.modal', function () {
+           window.location.reload(true);
+       });
 
-  // Also, remove the values entered in the input and textarea for note entry
-  $("#titleinput").val("");
-  $("#bodyinput").val("");
 });
+
+// When you click the delete button
+$(document).on("click", ".delete-btn", function() {
+  // Grab the id associated with the article from the submit button
+  var thisId = $(this).attr("data-article-id");
+
+  // Run a POST request to change the note, using what's entered in the inputs
+  $.ajax({
+    method: "PUT",
+    url: "/articles-del/" + thisId,
+    data: {
+      externalArticleId : thisId
+    }
+  })
+    // With that done
+    .done(function(data) {
+      // Log the response
+      console.log(data);
+      // Empty the notes section
+      $('#modal-delete-confirm').modal('show');
+    });
+    //refresh page after buying
+    $("#modal-delete-confirm").on('hidden.bs.modal', function () {
+           window.location.reload(true);
+       });
+
+});
+
+$(document).on("click", ".add-note-btn", function() {
+  // Grab the id associated with the article from the submit button
+  var thisId = $(this).attr("data-article-id");
+  $('#modal-note').modal('show');
+    //refresh page after buying
+});
+
+$(document).on("click", "#confirm-save-note", function() {
+  // Grab the id associated with the article from the submit button
+  var thisId = $(this).attr("data-article-id");
+
+  $('#modal-note-confirm').modal('show');
+    //refresh page after buying
+});
+
+
+
+
+
+// $('body').on('click', '.buy-btn', function() {
+//     $("#buy-coinID").val($(this).attr("data-coinID"))
+//     $("#buy-ccPrice").val($(this).attr("data-price"))
+//     $("#buy-ccQuantity").val(0);
+//     $("#buy-ccQuantity").val(0);
+//     $("#buy-USDVAlue").val(0);
+//     $('#modal-buy').modal('show');
+//     console.log($("#usd-only").text());
