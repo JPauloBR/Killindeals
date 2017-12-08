@@ -84,6 +84,7 @@ $(document).on("click", ".add-note-btn", function() {
 $(document).on("click", "#confirm-save-note", function() {
   // Grab the id associated with the article from the submit button
   var thisId = $(this).attr("data-article-id");
+  $('#modal-note').modal('hide');
 
   $('#modal-note-confirm').modal('show');
     //refresh page after buying

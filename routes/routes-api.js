@@ -33,7 +33,15 @@ app.get("/scrape", function(req, res) {
       result.externalArticleId = $(this).attr("data-id");
       // Create a new Article using the `result` object built from scraping
       db.Article
-        .create(result)
+        .updateOne(
+          {externalArticleId : result.externalArticleId}, 
+          {
+            "$setOnInsert": result
+          }, 
+          {
+            new : true, 
+            upsert : true
+          })
         .then(function(dbArticle) {
           // If we were able to successfully scrape and save an Article, send a message to the client
           console.log("Scrape Complete!");
