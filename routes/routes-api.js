@@ -64,6 +64,7 @@ app.get("/", function(req, res) {
         console.log(err);
       }
       else {
+        console.log(resp);
         res.render("pages/index", {articles : resp});
       }
     })
@@ -73,7 +74,9 @@ app.get("/", function(req, res) {
 app.get("/saved", function(req, res) {
     console.log('html-routes: app.get(/saved)');
     // console.log(req.session.passport.user);
-    db.Article.find({isSaved : true }).sort({dateTime: -1}).then(function(resp, err) {
+    db.Article.find({isSaved : true }).sort({dateTime: -1})
+    .populate("notes")
+    .then(function(resp, err) {
       if(err) {
         console.log(err);
       }
@@ -128,4 +131,73 @@ app.put("/articles-del/:id", function(req, res) {
     res.json(err);
   })
 });
+
+// Route for saving a new Note to the db and associating it with a User
+app.put("/articles-add-note/:id", function(req, res) {
+
+  // Create a new Note in the db
+  db.Note
+    .create({body: req.body.body})
+    .then(function(dbNote) {
+      // If a Note was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
+      // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
+      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
+      return db.Article.findOneAndUpdate({externalArticleId : req.params.id}, { $push: { notes: dbNote._id } }, { new: true });
+    })
+    .then(function(dbArticle) {
+      // If the User was updated successfully, send it back to the client
+      console.log(dbArticle)
+      res.json(dbArticle);
+    })
+    .catch(function(err) {
+      // If an error occurs, send it back to the client
+      console.log(err)
+      res.json(err);
+    });
+});
+
+// Route to get all User's and populate them with their notes
+app.get("/populated", function(req, res) {
+  // Find all users
+  db.User
+    .find({})
+    // Specify that we want to populate the retrieved users with any associated notes
+    .populate("notes")
+    .then(function(dbUser) {
+      // If able to successfully find and associate all Users and Notes, send them back to the client
+      res.json(dbUser);
+    })
+    .catch(function(err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
+    });
+});
+
+app.delete("/note-del/:id", function(req, res) {
+  // Find all users
+  db.Note.findOneAndRemove({
+      "_id": req.params.id
+    }, function(err) {
+      if (err) {
+        console.log(err);
+        res.send(err);
+      } else {
+        db.Article.findOneAndUpdate({
+            externalArticleId : req.body.articleId
+          }, {
+            $pull: {
+              "notes": req.params.id
+            }
+          })
+          .exec(function(err) {
+            if (err) {
+              console.log(err);
+              res.send(err);
+            } else {
+              res.send("Note Deleted");
+            }
+          });
+      }
+    });
+  });
 };
