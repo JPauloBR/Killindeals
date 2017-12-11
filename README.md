@@ -20,6 +20,9 @@ KillinDeals is an scraping app configured to scrape kotaku.com and retrieve most
 
 [JP Oliveira](https://github.com/JPauloBR) 
 
+## Live App
+[Killingdeals](https://shielded-chamber-76660.herokuapp.com/)
+
 ## Acknowledgement
 Instructor - David Hallinan
 
